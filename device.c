@@ -35,7 +35,9 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 	if (!dev)
 		return VDP_STATUS_RESOURCES;
 
+#ifndef NO_X11
 	dev->display = XOpenDisplay(XDisplayString(display));
+#endif
 	dev->screen = screen;
 
 	if (!ve_open())
@@ -79,7 +81,9 @@ VdpStatus vdp_device_destroy(VdpDevice device)
 	if (dev->osd_enabled)
 		close(dev->g2d_fd);
 	ve_close();
+#ifndef NO_X11
 	XCloseDisplay(dev->display);
+#endif
 
 	handle_destroy(device);
 	free(dev);

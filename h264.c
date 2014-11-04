@@ -759,6 +759,7 @@ static VdpStatus h264_decode(decoder_ctx_t *decoder,
 	else
 		output_p->pic_type = PIC_TYPE_FRAME;
 
+
 	// activate H264 engine
 	writel((readl(c->regs + VE_CTRL) & ~0xf) | 0x1
 		| (decoder->width >= 2048 ? (0x1 << 21) : 0x0), c->regs + VE_CTRL);

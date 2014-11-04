@@ -2,10 +2,10 @@ TARGET = libvdpau_sunxi.so.1
 SRC = device.c presentation_queue.c surface_output.c surface_video.c \
 	surface_bitmap.c video_mixer.c decoder.c handles.c ve.c \
 	h264.c mpeg12.c mp4.c rgba.c
-CFLAGS = -Wall -O3
+CFLAGS = -Wall -O3 -DNO_X11
 LDFLAGS =
-LIBS = -lrt -lm -lX11
-CC = gcc
+LIBS = -lrt -lm
+#CC = gcc
 
 MAKEFLAGS += -rR --no-print-directory
 

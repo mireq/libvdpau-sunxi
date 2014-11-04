@@ -87,7 +87,9 @@ VdpStatus vdp_presentation_queue_target_create_x11(VdpDevice device,
 		ioctl(qt->fd, DISP_CMD_LAYER_TOP, args);
 	}
 
+#ifndef NO_X11
 	XSetWindowBackground(dev->display, drawable, 0x000102);
+#endif
 
 	if (!dev->osd_enabled)
 	{
@@ -256,10 +258,15 @@ VdpStatus vdp_presentation_queue_display(VdpPresentationQueue presentation_queue
 	if (earliest_presentation_time != 0)
 		VDPAU_DBG_ONCE("Presentation time not supported");
 
+#ifdef NO_X11
+	int x = 0;
+	int y = 0;
+#else
 	Window c;
 	int x,y;
 	XTranslateCoordinates(q->device->display, q->target->drawable, RootWindow(q->device->display, q->device->screen), 0, 0, &x, &y, &c);
 	XClearWindow(q->device->display, q->target->drawable);
+#endif
 
 	if (os->vs)
 	{

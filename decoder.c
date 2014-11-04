@@ -21,6 +21,9 @@
 #include "vdpau_private.h"
 #include "ve.h"
 
+//#include <stdio.h>
+//static FILE *fp;
+
 VdpStatus vdp_decoder_create(VdpDevice device,
                              VdpDecoderProfile profile,
                              uint32_t width,
@@ -28,6 +31,17 @@ VdpStatus vdp_decoder_create(VdpDevice device,
                              uint32_t max_references,
                              VdpDecoder *decoder)
 {
+	/*
+	if (getenv("DUMP_VDPAU")) {
+		fp = fopen("out.dat", "w");
+		fwrite(&width, sizeof(width), 1, fp);
+		fwrite(&height, sizeof(height), 1, fp);
+		double ratio = 1.0;
+		fwrite(&ratio, sizeof(ratio), 1, fp);
+		fwrite(&profile, sizeof(profile), 1, fp);
+	}
+	*/
+
 	device_ctx_t *dev = handle_get(device);
 	if (!dev)
 		return VDP_STATUS_INVALID_HANDLE;
@@ -154,6 +168,14 @@ VdpStatus vdp_decoder_render(VdpDecoder decoder,
 		memcpy(dec->data + pos, bitstream_buffers[i].bitstream, bitstream_buffers[i].bitstream_bytes);
 		pos += bitstream_buffers[i].bitstream_bytes;
 	}
+	/*
+	if (getenv("DUMP_VDPAU")) {
+		printf("size %d\n", pos);
+		fwrite(picture_info, sizeof(VdpPictureInfoH264), 1, fp);
+		fwrite(&pos, sizeof(pos), 1, fp);
+		fwrite(dec->data, pos, 1, fp);
+	}
+	*/
 	ve_flush_cache(dec->data, pos);
 
 	return dec->decode(dec, picture_info, pos, vid);

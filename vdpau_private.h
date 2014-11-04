@@ -26,7 +26,14 @@
 
 #include <stdlib.h>
 #include <vdpau/vdpau.h>
+#ifdef NO_X11
+typedef struct
+{
+} Display;
+typedef int Drawable;
+#else
 #include <X11/Xlib.h>
+#endif
 
 #define INTERNAL_YCBCR_FORMAT (VdpYCbCrFormat)0xffff
 
