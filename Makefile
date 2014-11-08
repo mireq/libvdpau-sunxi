@@ -1,4 +1,5 @@
 TARGET = libvdpau_sunxi.so.1
+TARGET_STATIC = libvdpau_sunxi.a
 SRC = device.c presentation_queue.c surface_output.c surface_video.c \
 	surface_bitmap.c video_mixer.c decoder.c handles.c ve.c \
 	h264.c mpeg12.c mp4.c rgba.c
@@ -24,9 +25,12 @@ endif
 
 .PHONY: clean all install
 
-all: $(TARGET)
-$(TARGET): $(OBJ)
-	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(OBJ) $(LIBS) -o $@
+all: $(TARGET) $(TARGET_STATIC)
+$(TARGET): $(TARGET_STATIC)
+	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(TARGET_STATIC) $(LIBS) -o $@
+
+$(TARGET_STATIC): $(OBJ)
+	ar -cvq $(TARGET_STATIC) *.o
 
 clean:
 	rm -f $(OBJ)
