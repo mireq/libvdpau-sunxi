@@ -26,8 +26,8 @@ endif
 .PHONY: clean all install
 
 all: $(TARGET) $(TARGET_STATIC)
-$(TARGET): $(TARGET_STATIC)
-	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(TARGET_STATIC) $(LIBS) -o $@
+$(TARGET): $(OBJ)
+	$(CC) $(LIB_LDFLAGS) $(LDFLAGS) $(OBJ) $(LIBS) -o $@
 
 $(TARGET_STATIC): $(OBJ)
 	ar -cvq $(TARGET_STATIC) *.o

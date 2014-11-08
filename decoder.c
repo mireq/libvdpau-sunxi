@@ -21,8 +21,9 @@
 #include "vdpau_private.h"
 #include "ve.h"
 
-//#include <stdio.h>
-//static FILE *fp;
+#include <stdio.h>
+static FILE *fp;
+static uint32_t framecount;
 
 VdpStatus vdp_decoder_create(VdpDevice device,
                              VdpDecoderProfile profile,
@@ -31,16 +32,14 @@ VdpStatus vdp_decoder_create(VdpDevice device,
                              uint32_t max_references,
                              VdpDecoder *decoder)
 {
-	/*
 	if (getenv("DUMP_VDPAU")) {
-		fp = fopen("out.dat", "w");
+		fp = fopen(getenv("DUMP_VDPAU"), "w+");
+		fseek(fp, 0, SEEK_SET);
 		fwrite(&width, sizeof(width), 1, fp);
 		fwrite(&height, sizeof(height), 1, fp);
-		double ratio = 1.0;
-		fwrite(&ratio, sizeof(ratio), 1, fp);
+		fwrite(&framecount, sizeof(framecount), 1, fp);
 		fwrite(&profile, sizeof(profile), 1, fp);
 	}
-	*/
 
 	device_ctx_t *dev = handle_get(device);
 	if (!dev)
@@ -110,6 +109,11 @@ err_ctx:
 
 VdpStatus vdp_decoder_destroy(VdpDecoder decoder)
 {
+	if (getenv("DUMP_VDPAU")) {
+		fseek(fp, sizeof(uint32_t) * 2, SEEK_SET);
+		fwrite(&framecount, sizeof(framecount), 1, fp);
+		fclose(fp);
+	}
 	decoder_ctx_t *dec = handle_get(decoder);
 	if (!dec)
 		return VDP_STATUS_INVALID_HANDLE;
@@ -168,14 +172,13 @@ VdpStatus vdp_decoder_render(VdpDecoder decoder,
 		memcpy(dec->data + pos, bitstream_buffers[i].bitstream, bitstream_buffers[i].bitstream_bytes);
 		pos += bitstream_buffers[i].bitstream_bytes;
 	}
-	/*
 	if (getenv("DUMP_VDPAU")) {
-		printf("size %d\n", pos);
+		fwrite(&target, sizeof(target), 1, fp);
 		fwrite(picture_info, sizeof(VdpPictureInfoH264), 1, fp);
 		fwrite(&pos, sizeof(pos), 1, fp);
 		fwrite(dec->data, pos, 1, fp);
+		framecount++;
 	}
-	*/
 	ve_flush_cache(dec->data, pos);
 
 	return dec->decode(dec, picture_info, pos, vid);
