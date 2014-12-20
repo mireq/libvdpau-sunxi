@@ -31,7 +31,7 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 	if (!display || !device || !get_proc_address)
 		return VDP_STATUS_INVALID_POINTER;
 
-	device_ctx_t *dev = calloc(1, sizeof(device_ctx_t));
+	device_ctx_t *dev = handle_create(sizeof(*dev), device);
 	if (!dev)
 		return VDP_STATUS_RESOURCES;
 
@@ -42,7 +42,7 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 
 	if (!ve_open())
 	{
-		free(dev);
+		handle_destroy(*device);
 		return VDP_STATUS_ERROR;
 	}
 
@@ -56,17 +56,6 @@ VdpStatus vdp_imp_device_create_x11(Display *display,
 			VDPAU_DBG("Failed to open /dev/g2d! OSD disabled.");
 	}
 
-	int handle = handle_create(dev);
-	if (handle == -1)
-	{
-		if (dev->osd_enabled)
-			close(dev->g2d_fd);
-		ve_close();
-		free(dev);
-		return VDP_STATUS_RESOURCES;
-	}
-
-	*device = handle;
 	*get_proc_address = &vdp_get_proc_address;
 
 	return VDP_STATUS_OK;
@@ -86,7 +75,6 @@ VdpStatus vdp_device_destroy(VdpDevice device)
 #endif
 
 	handle_destroy(device);
-	free(dev);
 
 	return VDP_STATUS_OK;
 }

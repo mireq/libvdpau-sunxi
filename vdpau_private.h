@@ -165,19 +165,23 @@ typedef struct
 #define VDPAU_DBG_ONCE(format, ...)
 #endif
 
+#define EXPORT __attribute__ ((visibility ("default")))
+
 VdpStatus new_decoder_mpeg12(decoder_ctx_t *decoder);
 VdpStatus new_decoder_h264(decoder_ctx_t *decoder);
-VdpStatus new_decoder_mp4(decoder_ctx_t *decoder);
+VdpStatus new_decoder_mpeg4(decoder_ctx_t *decoder);
 
 void yuv_unref(yuv_data_t *yuv);
 yuv_data_t *yuv_ref(yuv_data_t *yuv);
 VdpStatus yuv_prepare(video_surface_ctx_t *video_surface);
 
-int handle_create(void *data);
-void *handle_get(int handle);
-void handle_destroy(int handle);
+typedef uint32_t VdpHandle;
 
-VdpStatus vdp_imp_device_create_x11(Display *display, int screen, VdpDevice *device, VdpGetProcAddress **get_proc_address);
+void *handle_create(size_t size, VdpHandle *handle);
+void *handle_get(VdpHandle handle);
+void handle_destroy(VdpHandle handle);
+
+EXPORT VdpStatus vdp_imp_device_create_x11(Display *display, int screen, VdpDevice *device, VdpGetProcAddress **get_proc_address);
 VdpStatus vdp_device_destroy(VdpDevice device);
 VdpStatus vdp_preemption_callback_register(VdpDevice device, VdpPreemptionCallback callback, void *context);
 
